@@ -20,10 +20,14 @@ const OrderSchema = new Schema(
       enum: [COD, PAYPAL],
       default: COD,
     },
-    amount: {
-      type: Number,
-      min: 0,
+    user: {
+      type: Schema.Types.ObjectId,
       required: true,
+      ref: "users",
+    },
+    exporter: {
+      type: Schema.Types.ObjectId,
+      ref: "users",
     },
   },
   {

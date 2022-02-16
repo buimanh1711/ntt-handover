@@ -1,8 +1,9 @@
-const { SUCCESS, OK, ERROR } = require("../../configs/constants");
+const mongoose = require("mongoose");
+const { SUCCESS, OK, ERROR, PAGE_SIZE } = require("../../configs/constants");
 const catchHandlerError = require("../../helpers/catch_handler_error");
 const ProductModel = require("../../models/product.model");
-require("../../models/category.model");
-require("../../models/brand.model");
+const RatingModel = require("../../models/rating.model");
+
 class ProductHandlers {
   async createProduct(data) {
     try {
@@ -82,28 +83,35 @@ class ProductHandlers {
 
   async queryProducts(params, conditions) {
     try {
-      const { limit, start, min_price, max_price, search } = conditions;
+      const {
+        page,
+        limit,
+        start,
+        min_price,
+        max_price,
+        search,
+        sort,
+        sort_value,
+      } = conditions;
+
       const query = {
         ...params,
-        categories: { $all: params.categories },
         price: {
           $gte: min_price || 0,
           $lte: max_price || 10000000000000000,
         },
+        rate: {
+          $gte: params.rate || 0,
+        },
       };
+      const sortQuery = {};
+
+      if (sort && sort_value) sortQuery[sort] = sort_value;
       if (search?.trim()) query.$text = { $search: search };
 
+      const total = await ProductModel.countDocuments(query);
       const results = await ProductModel.find(query)
-        // .populate({
-        //   path: "categories",
-        //   model: "category_model",
-        //   select: "name slug image_url",
-        // })
-        // .populate({
-        //   path: "brand",
-        //   model: "brand_model",
-        //   select: "name slug image_url",
-        // })
+        .sort(sortQuery)
         .skip(start)
         .limit(limit);
 
@@ -118,6 +126,11 @@ class ProductHandlers {
         response: {
           status: OK,
           message: "Get products successfully!",
+          pagination: {
+            total,
+            size: PAGE_SIZE,
+            current: page || 1,
+          },
           data: results,
         },
       };
@@ -132,7 +145,7 @@ class ProductHandlers {
         slug,
       })
         .populate({
-          path: "category",
+          path: "categories",
           model: "category_model",
           select: "name slug image_url",
         })

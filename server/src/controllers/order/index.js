@@ -69,6 +69,21 @@ class OrderController {
     }
   }
 
+  async queryUsersOrdersList(req, res, next) {
+    try {
+      const params = DTO.queryUserOrdersList(req.query);
+      const response = await OrderHandlers.queryUserOrdersList(params);
+
+      if (response.status === ERROR) return next(response.response);
+
+      return res.json(response.response);
+    } catch (error) {
+      return next(
+        new HttpException(error.status || 500, catchRoutesError(error))
+      );
+    }
+  }
+
   async getOneOrder(req, res, next) {
     try {
       const { _id } = DTO.getOneOrder(req.params);

@@ -41,23 +41,20 @@ class DTO {
     };
   }
 
-  removeCartItem(data) {
-    const { cart_items } = data;
+  removeCartItems(data) {
+    const { _ids } = data;
 
     const schema = Joi.object({
-      cart_items: Joi.array()
-        .min(1)
-        .items(Joi.string().alphanum().required())
-        .required(),
+      _ids: Joi.array().min(1).items(Joi.string().alphanum()).required(),
     });
 
     const { error } = schema.validate({
-      cart_items,
+      _ids,
     });
 
     catchValidateError(error);
 
-    return cart_items;
+    return _ids;
   }
 
   queryCart(params) {

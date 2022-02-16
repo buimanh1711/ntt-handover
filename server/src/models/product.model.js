@@ -8,11 +8,12 @@ const ProductSchema = new Schema(
       type: String,
       required: true,
       text: true,
-      unique: true
+      unique: true,
     },
     categories: [
       {
         type: Schema.Types.ObjectId,
+        ref: "categories",
       },
     ],
     brand: {

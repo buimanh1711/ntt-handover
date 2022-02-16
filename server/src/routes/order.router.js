@@ -4,6 +4,7 @@ const OrderControllers = require("../controllers/order");
 const auth = require("../middlewares/auth");
 const orderRouter = Router();
 
+orderRouter.get("/user", auth(USER), OrderControllers.queryUsersOrdersList);
 orderRouter.get("/", auth(ADMIN), OrderControllers.queryOrders);
 orderRouter.get("/:_id", auth(USER), OrderControllers.getOneOrder);
 

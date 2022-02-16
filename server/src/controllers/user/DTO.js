@@ -30,12 +30,11 @@ class DTO {
         .email({ tlds: { allow: false } })
         .required(),
       password: Joi.string().min(6).required(),
-      first_name: Joi.string().alphanum().min(1).required(),
-      last_name: Joi.string().alphanum().min(1).required(),
+      first_name: Joi.string().min(1).required(),
+      last_name: Joi.string().min(1).required(),
       sex: Joi.string().valid(MALE, FEMALE, BISEXUAL),
       address: Joi.string().min(10).required(),
-      phone: joi
-        .string()
+      phone: Joi.string()
         .length(10)
         .pattern(/^[0-9]+$/)
         .required(),
@@ -82,20 +81,16 @@ class DTO {
     } = newData || {};
 
     const schema = Joi.object({
-      _id: Joi.string().alphanum().required(),
-      email: Joi.string()
-        .email({ tlds: { allow: false } })
-        .required(),
+      _id: Joi.string().alphanum(),
+      email: Joi.string().email({ tlds: { allow: false } }),
       password: Joi.string().min(6),
-      first_name: Joi.string().alphanum().min(1),
-      last_name: Joi.string().alphanum().min(1),
+      first_name: Joi.string().min(1),
+      last_name: Joi.string().min(1),
       sex: Joi.string().valid(MALE, FEMALE, BISEXUAL),
       address: Joi.string().min(10),
-      phone: joi
-        .string()
+      phone: Joi.string()
         .length(10)
-        .pattern(/^[0-9]+$/)
-        .required(),
+        .pattern(/^[0-9]+$/),
       avt_url: Joi.string().min(1),
     });
 

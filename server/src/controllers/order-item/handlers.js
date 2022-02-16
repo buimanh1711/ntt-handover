@@ -1,17 +1,38 @@
 const { SUCCESS, OK, ERROR } = require("../../configs/constants");
 const catchHandlerError = require("../../helpers/catch_handler_error");
 const OrderItemModel = require("../../models/order_item.model");
+const ProductModel = require("../../models/product.model");
 
 class OrderItemHandlers {
   async createOrderItems(data) {
+    const { order_items } = data;
     try {
-      const result = await OrderItemModel.create(data);
+      const result = await OrderItemModel.create(order_items);
 
       if (!result || result === "null")
         return {
           status: ERROR,
           response: new HttpException(400, "Can not order items!"),
         };
+
+      let updatePromises = [];
+      order_items.forEach((item) => {
+        updatePromises.push(
+          ProductModel.updateOne(
+            {
+              _id: item.product,
+            },
+            {
+              $inc: {
+                sold: item.quantity,
+                stock: -item.quantity,
+              },
+            }
+          )
+        );
+      });
+
+      const responses = await Promise.all(updatePromises);
 
       return {
         status: SUCCESS,
@@ -51,11 +72,17 @@ class OrderItemHandlers {
 
   async queryOrderItems(params) {
     try {
-      const { _id } = params;
-      const results = await OrderItemModel.find({ _id }).populate({
-        path: "product",
-        model: "product_model",
-      });
+      const { order_id } = params;
+      const results = await OrderItemModel.find({ order_id })
+        .populate({
+          path: "product",
+          model: "product_model",
+          select: "name brand slug thumnail_url",
+        })
+        .populate({
+          path: "product.brand",
+          model: "brand_model",
+        });
 
       if (!results || results === "null")
         return {

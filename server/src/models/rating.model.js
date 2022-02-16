@@ -8,18 +8,19 @@ const RatingSchema = new Schema(
       required: true,
       ref: "products",
     },
-    user_id: {
+    user: {
       type: Schema.Types.ObjectId,
       required: true,
       ref: "users",
     },
     stars: {
       type: Number,
-      required: true,
       min: 0,
       max: 5,
-      default: 5,
     },
+    content: {
+      type: String,
+    }
   },
   {
     collection: "ratings",

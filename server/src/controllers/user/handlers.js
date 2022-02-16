@@ -88,7 +88,7 @@ class UserHandlers {
     }
   }
 
-  async getOneProduct(_id) {
+  async getOneUser(_id) {
     try {
       const result = await UserModel.findOne({
         _id,

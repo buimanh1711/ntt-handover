@@ -88,7 +88,8 @@ class BrandHandlers {
 
       if (search?.trim()) query.$text = { $search: search };
 
-      const results = await BrandModel.find(query).skip(start).limit(limit);
+      const results = await BrandModel.find(query);
+      // .skip(start).limit(limit);
 
       if (!results || results === "null")
         return {

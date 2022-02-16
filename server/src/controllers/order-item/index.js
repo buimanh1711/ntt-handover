@@ -7,7 +7,7 @@ const { ERROR } = require("../../configs/constants");
 class OrderItemControllers {
   async createOrderItems(req, res, next) {
     try {
-      const data = DTO.addToCart(req.body);
+      const data = DTO.createOrderItems(req.body);
       const response = await OrderItemHandlers.createOrderItems(data);
 
       if (response.status === ERROR) return next(response.response);

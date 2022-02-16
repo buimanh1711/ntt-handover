@@ -39,8 +39,8 @@ class CartControllers {
 
   async removeCartItems(req, res, next) {
     try {
-      const item_ids = DTO.removeCartItem(req.body);
-      const response = await CartHandlers.removeCartItem(item_ids);
+      const _ids = DTO.removeCartItems(req.body);
+      const response = await CartHandlers.removeCartItems(_ids);
 
       if (response.status === ERROR) return next(response.response);
 
@@ -54,8 +54,8 @@ class CartControllers {
 
   async queryCart(req, res, next) {
     try {
-      const { params, conditions } = DTO.queryCart(req.query);
-      const response = await CartHandlers.queryCart(params, conditions);
+      const params = DTO.queryCart(req.query);
+      const response = await CartHandlers.queryCart(params);
 
       if (response.status === ERROR) return next(response.response);
 

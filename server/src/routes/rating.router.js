@@ -4,8 +4,8 @@ const RatingControllers = require("../controllers/rating/index");
 const auth = require("../middlewares/auth");
 const ratingRouter = Router();
 
-ratingRouter.get("/:product_id", RatingControllers.queryStars);
-
+ratingRouter.get("/", RatingControllers.queryRates);
+ratingRouter.get("/bought", RatingControllers.getIsBought);
 ratingRouter.post("/", auth(USER), RatingControllers.createRate);
 
 module.exports = ratingRouter;

@@ -74,7 +74,7 @@ class UserControllers {
   async getOneUser(req, res, next) {
     try {
       const _id = DTO.getOneUser(req.params);
-      const response = await UserHandlers.getOneProduct(_id);
+      const response = await UserHandlers.getOneUser(_id);
 
       if (response.status === ERROR) return next(response.response);
 

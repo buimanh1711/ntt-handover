@@ -4,6 +4,7 @@ const catchValidateError = require("../../helpers/catch_validate_error");
 const getPage = require("../../helpers/get_page");
 const toSlug = require("../../helpers/to_slug");
 const _ = require("lodash");
+const mongoose = require("mongoose");
 class DTO {
   createProduct(data) {
     const {
@@ -120,18 +121,22 @@ class DTO {
       min_price,
       max_price,
       origin,
+      sort,
+      sort_value,
     } = params || {};
 
     const categoryArr = _.compact((categories || "").split(","));
 
     const schema = Joi.object({
-      categories: Joi.array().min(1).items(Joi.string().alphanum().min(1)),
+      categories: Joi.array().items(Joi.string().alphanum().min(1)),
       brand: Joi.string().alphanum().min(1),
       min_price: Joi.number().min(0),
       max_price: Joi.number().min(0),
       origin: Joi.string().valid(INLAND, OVERSEA),
       rate: Joi.number().min(0).max(5),
       page: Joi.number().min(1),
+      sort: Joi.string().min(1),
+      sort_value: Joi.string().valid("1", "-1"),
     });
 
     const { error } = schema.validate({
@@ -142,6 +147,8 @@ class DTO {
       origin,
       rate,
       page,
+      sort,
+      sort_value,
     });
 
     catchValidateError(error);
@@ -153,9 +160,18 @@ class DTO {
       start,
       limit,
       search: search,
+      sort,
+      sort_value,
+      page,
     };
 
-    params.categories = categoryArr;
+    if (categoryArr.length > 0)
+      params.categories = {
+        $all: categoryArr.map((item) => new mongoose.Types.ObjectId(item)),
+      };
+
+    if (params.brand) params.brand = new mongoose.Types.ObjectId(params.brand);
+
     delete params["page"];
     delete params["min_price"];
     delete params["max_price"];

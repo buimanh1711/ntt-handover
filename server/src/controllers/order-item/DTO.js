@@ -8,7 +8,7 @@ class DTO {
     const { order_items } = data || {};
 
     const schema = Joi.object({
-      order_items: Joi.array
+      order_items: Joi.array()
         .min(1)
         .items(
           Joi.object({

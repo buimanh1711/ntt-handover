@@ -11,23 +11,23 @@ const getPage = require("../../helpers/get_page");
 const _ = require("lodash");
 class DTO {
   createOrder(data) {
-    const { payment_type, amount } = data || {};
+    const { payment_type, user } = data || {};
 
     const schema = Joi.object({
       payment_type: Joi.string().valid(COD, PAYPAL).required(),
-      amount: Joi.number().min(1),
+      user: Joi.string().alphanum().required(),
     });
 
     const { error } = schema.validate({
       payment_type,
-      amount,
+      user,
     });
 
     catchValidateError(error);
 
     return {
       payment_type,
-      amount,
+      user,
     };
   }
 
@@ -35,15 +35,17 @@ class DTO {
     const { order_status, payment_type, amount } = newData || {};
 
     const schema = Joi.object({
-      payment_type: Joi.string().valid(COD, PAYPAL).required(),
-      amount: Joi.number().min(1),
+      payment_type: Joi.string().valid(COD, PAYPAL),
       order_status: Joi.string().valid(PENDING, DONE),
+      user: Joi.string().alphanum(),
+      exporter: Joi.string().alphanum(),
     });
 
     const { error } = schema.validate({
       order_status,
       payment_type,
-      amount,
+      user,
+      exporter,
     });
 
     catchValidateError(error);
@@ -51,7 +53,8 @@ class DTO {
     return {
       order_status,
       payment_type,
-      amount,
+      user,
+      exporter,
     };
   }
 
@@ -70,18 +73,20 @@ class DTO {
   }
 
   queryOrders(params) {
-    const { order_status, payment_type, page } = params || {};
+    const { order_status, payment_type, page, user } = params || {};
 
     const schema = Joi.object({
-      payment_type: Joi.string().valid(COD, PAYPAL).required(),
+      payment_type: Joi.string().valid(COD, PAYPAL),
       order_status: Joi.string().valid(PENDING, DONE, CONFIRMED),
       page: Joi.number().min(1),
+      user: Joi.string().alphanum(),
     });
 
     const { error } = schema.validate({
       order_status,
       payment_type,
       page,
+      user,
     });
 
     catchValidateError(error);
@@ -95,6 +100,24 @@ class DTO {
         start,
         limit,
       },
+    };
+  }
+
+  queryUserOrdersList(params) {
+    const { user } = params || {};
+
+    const schema = Joi.object({
+      user: Joi.string().alphanum().required(),
+    });
+
+    const { error } = schema.validate({
+      user,
+    });
+
+    catchValidateError(error);
+
+    return {
+      user,
     };
   }
 

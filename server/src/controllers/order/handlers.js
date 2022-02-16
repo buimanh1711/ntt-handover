@@ -1,6 +1,7 @@
 const { SUCCESS, OK, ERROR } = require("../../configs/constants");
 const catchHandlerError = require("../../helpers/catch_handler_error");
 const OrderModel = require("../../models/order.model");
+const OrderItemModel = require("../../models/order_item.model");
 require("../../models/category.model");
 require("../../models/brand.model");
 class OrderHandlers {
@@ -84,19 +85,7 @@ class OrderHandlers {
     try {
       const { limit, start } = conditions;
 
-      const results = await OrderModel.find(params)
-        // .populate({
-        //   path: "categories",
-        //   model: "category_model",
-        //   select: "name slug image_url",
-        // })
-        // .populate({
-        //   path: "brand",
-        //   model: "brand_model",
-        //   select: "name slug image_url",
-        // })
-        .skip(start)
-        .limit(limit);
+      const results = await OrderModel.find(params).skip(start).limit(limit);
 
       if (!results || results === "null")
         return {
@@ -104,12 +93,74 @@ class OrderHandlers {
           response: new HttpException(400, "Can not get orders!"),
         };
 
+      const orderDetails = await Promise.all(
+        results.map(async (item) => {
+          const order_items = await OrderItemModel.find({
+            order_id: item._id,
+          }).populate({
+            path: "product",
+            model: "product_model",
+            populate: {
+              path: "brand",
+              model: "brand_model",
+            },
+          });
+
+          return {
+            ...item.toObject(),
+            order_items,
+          };
+        })
+      );
+
       return {
         status: SUCCESS,
         response: {
           status: OK,
           message: "Get orders successfully!",
-          data: results,
+          data: orderDetails,
+        },
+      };
+    } catch (error) {
+      return catchHandlerError(error);
+    }
+  }
+
+  async queryUserOrdersList({ user }) {
+    try {
+      const results = await OrderModel.find({ user });
+      if (!results || results === "null")
+        return {
+          status: ERROR,
+          response: new HttpException(400, "Can not get orders!"),
+        };
+
+      const orderDetails = await Promise.all(
+        results.map(async (item) => {
+          const order_items = await OrderItemModel.find({
+            order_id: item._id,
+          }).populate({
+            path: "product",
+            model: "product_model",
+            populate: {
+              path: "brand",
+              model: "brand_model",
+            },
+          });
+
+          return {
+            ...item.toObject(),
+            order_items,
+          };
+        })
+      );
+
+      return {
+        status: SUCCESS,
+        response: {
+          status: OK,
+          message: "Get orders successfully!",
+          data: orderDetails,
         },
       };
     } catch (error) {

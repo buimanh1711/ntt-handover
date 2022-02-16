@@ -1,11 +1,12 @@
 const { Router } = require("express");
+const NotificationControllers = require("../controllers/notification");
 
 const noitificationRouter = Router();
 
-noitificationRouter.get("/");
-noitificationRouter.get("/:slug");
-
-noitificationRouter.post("/");
-noitificationRouter.put("/:_id");
+noitificationRouter.get(
+  "/:user_id",
+  NotificationControllers.queryUserNotifications
+);
+noitificationRouter.get("/", NotificationControllers.queryAllNotifications);
 
 module.exports = noitificationRouter;

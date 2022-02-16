@@ -2,6 +2,24 @@ const Joi = require("joi");
 const catchValidateError = require("../../helpers/catch_validate_error");
 
 class DTO {
+  verify(data) {
+    const { access_token } = data || {};
+
+    const schema = Joi.object({
+      access_token: Joi.string().min(1),
+    });
+
+    const { error } = schema.validate({
+      access_token,
+    });
+
+    catchValidateError(error);
+
+    return {
+      access_token,
+    };
+  }
+
   login(data) {
     const { email, password } = data || {};
 

@@ -17,4 +17,10 @@ module.exports = {
   SUPER: 0,
   ADMIN: 1,
   USER: 2,
+  wsConnectionName: {
+    NOTIFICATION: "notification",
+  },
+  wsCommands: {
+    PUSH_MESSAGE: 'PUSH_MESSAGE'
+  }
 };

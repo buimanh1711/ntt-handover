@@ -1,10 +1,26 @@
 const { SUCCESS, OK, ERROR } = require("../../configs/constants");
 const catchHandlerError = require("../../helpers/catch_handler_error");
+const HttpException = require("../../helpers/http_exception");
 const CartItemModel = require("../../models/cart_item.model");
+const ProductModel = require("../../models/product.model");
 
 class ProductHandlers {
   async addToCart(data) {
     try {
+      const productInfo = await ProductModel.findOne({ _id: data.product });
+
+      if (productInfo?.stock < data.quantity)
+        return {
+          status: ERROR,
+          response: new HttpException(400, "Over stock!"),
+        };
+
+      const oldItem = await CartItemModel.findOne({
+        product: data.product,
+      });
+
+      if (oldItem?.product) return this.updateCartItem(oldItem._id, data);
+
       const result = await CartItemModel.create(data);
 
       if (!result || result === "null")
@@ -56,25 +72,25 @@ class ProductHandlers {
     }
   }
 
-  async removeCartItem(_ids) {
+  async removeCartItems(_ids) {
     try {
       const result = await CartItemModel.deleteMany({
         _id: {
-          $in: _ids,
+          $in: _ids
         },
       });
 
       if (!result || result === "null")
         return {
           status: ERROR,
-          response: new HttpException(400, "Can not remove cart items!"),
+          response: new HttpException(400, "Can not remove cart item!"),
         };
 
       return {
         status: SUCCESS,
         response: {
           status: OK,
-          message: "Remove cart items successfully!",
+          message: "Remove cart item successfully!",
           data: result,
         },
       };
